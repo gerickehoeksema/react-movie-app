@@ -4,7 +4,6 @@ import React from 'react'
 import {
     IMAGE_BASE_URL
     ,BACKDROP_SIZE
-    ,POSTER_SIZE
 } from '../../../config';
 
 // styles

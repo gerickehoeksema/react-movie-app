@@ -40,39 +40,74 @@ class Movie extends Component {
     // #endregion
 
     //#region custom methods
-    fetchItems = (endpoint) => {
-        fetch(endpoint)
-        .then(result => result.json())
-        .then(result => {
+    fetchItems = async endpoint => {
+        try {
+            const result = await (await fetch(endpoint)).json()
+
             if (result.status_code) {
+                // If we don't find any movie
                 this.setState({ loading: false })
             }
             else {
-                this.setState({ movie: result }, () => {
-                    // fetch actors
-                    const endpoint = `${API_URL}movie/${this.props.match.params.movieId}/credits?api_key=${API_KEY}`;
-                    fetch(endpoint)
-                    .then(result => result.json())
-                    .then(result => {
-                        console.log(result)
-                        const directors = result.crew.filter(member => member.job === "Director");
-                        this.setState({
-                            actors: result.cast,
-                            directors,
-                            loading: false 
-                        })
-                    }, () => {
-                        // Don't store search results
-                        if (this.state.searchTerm === '') {
-                            // Store data to local browser storage
-                            localStorage.setItem(`${this.props.match.params.movieId}`, JSON.stringify(this.state))
-                        }
-                    })
+                this.setState({ movie: result });
+
+                const creditsEndpoint = `${API_URL}movie/${this.props.match.params.movieId}/credits?api_key=${API_KEY}`;
+                const creditsResult = await (await fetch(creditsEndpoint)).json();
+                const directors = creditsResult.crew.filter(member => member.job === "Director");
+
+                this.setState({
+                    actors: creditsResult.cast,
+                    directors,
+                    loading: false 
+                }, () => {
+                    // Don't store search results
+                    if (this.state.searchTerm === '') {
+                        // Store data to local browser storage
+                        localStorage.setItem(`${this.props.match.params.movieId}`, JSON.stringify(this.state))
+                    }
                 })
             }
-        })
-        .catch(error => console.error('Error:', error))
+        }
+        catch (e)
+        {
+            console.error(`Error: ${e}`)
+        }
     }
+
+
+    // fetchItems = (endpoint) => {
+    //     fetch(endpoint)
+    //     .then(result => result.json())
+    //     .then(result => {
+    //         if (result.status_code) {
+    //             this.setState({ loading: false })
+    //         }
+    //         else {
+    //             this.setState({ movie: result }, () => {
+    //                 // fetch actors
+    //                 const endpoint = `${API_URL}movie/${this.props.match.params.movieId}/credits?api_key=${API_KEY}`;
+    //                 fetch(endpoint)
+    //                 .then(result => result.json())
+    //                 .then(result => {
+    //                     console.log(result)
+    //                     const directors = result.crew.filter(member => member.job === "Director");
+    //                     this.setState({
+    //                         actors: result.cast,
+    //                         directors,
+    //                         loading: false 
+    //                     })
+    //                 }, () => {
+    //                     // Don't store search results
+    //                     if (this.state.searchTerm === '') {
+    //                         // Store data to local browser storage
+    //                         localStorage.setItem(`${this.props.match.params.movieId}`, JSON.stringify(this.state))
+    //                     }
+    //                 })
+    //             })
+    //         }
+    //     })
+    //     .catch(error => console.error('Error:', error))
+    // }
     // #endregion
 
     render(){
