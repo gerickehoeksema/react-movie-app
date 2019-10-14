@@ -50,6 +50,11 @@ export default function( state = defaultState, action) {
                 ...state,
                 laoding: true
             }
+        case actions.SET_POPULAR_PERSISTED_STATE:
+            return {
+                ...state,
+                ...action.payload
+            }
         default:
             return state;
     }

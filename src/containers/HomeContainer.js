@@ -10,12 +10,29 @@ import {
     showLoadingSpinner,
     searchMovies,
     clearMovies,
-    loadMoreMovies
+    loadMoreMovies,
+    setPopularPersistedState
 } from '../actions'
 
 class HomeContainer extends Component {
+
     componentDidMount() {
-        this.getMovies()
+        if(sessionStorage.getItem("HomeState")) {
+            const home = JSON.parse(sessionStorage.getItem("HomeState"));
+
+            this.props.setPopularPersistedState(home);
+        }
+        else {
+            this.getMovies();
+        }
+    }
+
+    componentDidUpdate() {
+        if(this.props.movies.length > 0) {
+            if(this.props.searchTerm === "") {
+                sessionStorage.setItem("HomeState", JSON.stringify(this.props))
+            }
+        }
     }
 
     getMovies = () => {
@@ -54,7 +71,8 @@ const mapDispatchToProps = { // Bind Action Creators an alternative
     showLoadingSpinner,
     searchMovies,
     clearMovies,
-    loadMoreMovies
+    loadMoreMovies,
+    setPopularPersistedState
 }
 
 export default connect(

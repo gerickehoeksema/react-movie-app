@@ -14,3 +14,12 @@ export const convertMoney = (money) => {
   });
   return formatter.format(money);
 }
+
+export const fetchMovies = (endPoint, returnFunc = result => result) => {
+  return fetch(endPoint)
+          .then(result => result.json())
+          .then(result => {
+              return returnFunc(result);
+          })
+          .catch(error => console.log('Error: ', error))
+}
